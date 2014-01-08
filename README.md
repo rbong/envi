@@ -34,7 +34,7 @@ will be set automatically. Text files will be opened automatically in Vim.
 Unknown file types are outputted to $HOME/.envi/unknown and then opened
 normally in vifm so that you can modify the behaviour. Behaviour of Vim and
 vifm on initialization (rebindings, etc) can be set inside
-$HOME/.envi/vifm-start and $HOME/.envi/Vim-start. Quitting inside of Vim with
+$HOME/.envi/vifm-start and $HOME/.envi/vim-start. Quitting inside of Vim with
 ZZ causes all the programs to exit. If you "lose" a server, need to reload
 configs, or accidentally closed it, run envi again; servers that
 were already open will reconnect, and missing servers will be created anew
@@ -72,9 +72,9 @@ vim --servername VV --remote-send (keys)
 Vim's server is called VV by default. There are several remote options for Vim.
 Search Vim's manual for "remote" to find these.
 ```
-man Vim
+man vim
 ```
-The simplest way to add new functions is to modify the vifm-start and Vim-start
+The simplest way to add new functions is to modify the vifm-start and vim-start
 files and bind keys to the commands. Look inside the files and study the source
 of envi to see my style for this.
 
