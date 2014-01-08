@@ -31,12 +31,13 @@ operation
 
 Use h and l to move normally in vifm. Working directory of Vim and your shell
 will be set automatically. Text files will be opened automatically in Vim.
-Unknown file types are outputted to $HOME/.envi/unknown so that you can modify
-the behaviour. Behaviour of Vim and vifm on initialization (rebindings, etc)
-can be set inside $HOME/.envi/vifm-start and $HOME/.envi/Vim-start. Quitting
-inside of Vim with ZZ causes all the programs to exit. If you "lose" a server,
-need to reload configs, or accidentally closed it, run envi again; servers that
-were already open will reconnect, and missing servers will be created anew.
+Unknown file types are outputted to $HOME/.envi/unknown and then opened
+normally in vifm so that you can modify the behaviour. Behaviour of Vim and
+vifm on initialization (rebindings, etc) can be set inside
+$HOME/.envi/vifm-start and $HOME/.envi/Vim-start. Quitting inside of Vim with
+ZZ causes all the programs to exit. If you "lose" a server, need to reload
+configs, or accidentally closed it, run envi again; servers that
+were already open will reconnect, and missing servers will be created anew
 The names of servers are kept in variables, so you should be able to add the
 option to have more instances open if you wish. envi -o opens files. However,
 the -o option replaces spaces with escaped spaces. The envi -O option is
@@ -46,12 +47,12 @@ for i in (arguments); do envi -o $i; done
 ```
 As such, you can use globbing such as envi -O \*.c and other expressions. The
 hacks used to prevent output from showing in the terminal work with both emacs
-and vi keys enabled in bash. In the script, sleep commands are sometimes used
-to make sure that servers are initialized to avoid expensive loops. It is not
-written for other computers, and if it behaves strangely you should increase
-the length of the sleep commands or write loops that ask tmux if the servers
-exist yet; this still might not work. envi will work best on a light system.
-Even though it's a personal script, feel free to submit issues if you
+and vi keys enabled in bash. In the script, single sleep commands are sometimes
+used to make sure that servers are initialized to avoid expensive loops. It is
+not written for other computers, and if it behaves strangely you should
+increase the length of the sleep commands or write loops that ask tmux if the
+servers exist yet; this still might not work. envi will work best on a light
+system.  Even though it's a personal script, feel free to submit issues if you
 experience any problems.
 
 modifying
@@ -74,8 +75,8 @@ Search Vim's manual for "remote" to find these.
 man Vim
 ```
 The simplest way to add new functions is to modify the vifm-start and Vim-start
-files and bind keys to the commands. Look inside vifm-start and study the
-script to see my style for this.
+files and bind keys to the commands. Look inside the files and study the source
+of envi to see my style for this.
 
 known issues
 ====
