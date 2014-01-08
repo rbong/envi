@@ -2,14 +2,15 @@ envi
 ====
 
 A dynamic file-passing and auto navigation bash script for vifm, Vim, and a
-shell. It uses tmux for servers. It is invisible in the shell; no navigation
-commands are shown. It is fairly extensible through rebindings. More
-modularity is coming through updates. envi exists because of the efficiency of
-working with the three major abstractions of data separately; text, programs,
-and directories. I didn't want ugly slow addons in Vim for navigation, or have
-to close Vim to open multiple files or navigate. I often found myself opening
-all three of the programs envi uses together, because vifm opens files in Vim
-automatically and I often wanted to see extra information in my shell.
+shell written in bash. It uses tmux for servers. It is invisible in the shell;
+no navigation commands are shown. It is fairly extensible through rebindings.
+More modularity is coming through updates. envi exists because of the efficiency
+of working with the three major abstractions of data separately; text,
+programs, and directories. I didn't want ugly slow addons in Vim for
+navigation, or have to close Vim to open multiple files or navigate. I often
+found myself opening all three of the programs envi uses together, because vifm
+opens files in Vim automatically and I often wanted to see extra information in
+my shell.
 
 dependencies
 ====
