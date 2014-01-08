@@ -1,15 +1,20 @@
 envi
 ====
 
-A dynamic file-passing and auto navigation bash script for vifm, vim, and a
+A dynamic file-passing and auto navigation bash script for vifm, Vim, and a
 shell. It uses tmux for servers. It is invisible in the shell; no navigation
-commands are shown. It is fairly extensible through rebindings.  More
-modularity is coming through updates.
+commands are shown. It is fairly extensible through rebindings. More
+modularity is coming through updates. envi exists because of the efficiency of
+working with the three major abstractions of data separately; text, programs,
+and directories. I didn't want ugly slow addons in Vim for navigation, or have
+to close Vim to open multiple files or navigate. I often found myself opening
+all three of the programs envi uses together, because vifm opens files in Vim
+automatically and I often wanted to see extra information in my shell.
 
 dependencies
 ====
 
-envi needs vifm, tmux, vim, and a terminal emulator (tested with xterm and st).
+envi needs vifm, tmux, Vim, and a terminal emulator (tested with xterm and st).
 A tiling window manager is recommended.
 
 installation
@@ -25,11 +30,11 @@ operation
 ====
 
 Use h and l to move normally in vifm. Working directory of Vim and your shell
-will be set automatically. Text files will be opened automatically in vim.
+will be set automatically. Text files will be opened automatically in Vim.
 Unknown file types are outputted to $HOME/.envi/unknown so that you can modify
-the behaviour. Behaviour of vim and vifm on initialization (rebindings, etc)
-can be set inside $HOME/.envi/vifm-start and $HOME/.envi/vim-start. Quitting
-inside of vim with ZZ causes all the programs to exit. If you "lose" a server,
+the behaviour. Behaviour of Vim and vifm on initialization (rebindings, etc)
+can be set inside $HOME/.envi/vifm-start and $HOME/.envi/Vim-start. Quitting
+inside of Vim with ZZ causes all the programs to exit. If you "lose" a server,
 need to reload configs, or accidentally closed it, run envi again; servers that
 were already open will reconnect, and missing servers will be created anew.
 The names of servers are kept in variables, so you should be able to add the
@@ -53,28 +58,28 @@ modifying
 ====
 
 When you are modifying, most extension should be done by sending keys through
-the servers. The default names of the servers are V2 for vim's tmux server, VT
+the servers. The default names of the servers are V2 for Vim's tmux server, VT
 for the shell's server, and VF for vifm's server. You can access these with
 ```
 tmux send-keys -t(servername) (keys)
 ```
-vim's built in server capabilities are also used. A tmux server is only used
-because vim does not support reconnection. vim's server can be accessed with
+Vim's built in server capabilities are also used. A tmux server is only used
+because Vim does not support reconnection. Vim's server can be accessed with
 ```
 vim --servername VV --remote-send (keys)
 ```
-vim's server is called VV by default. There are several remote options for vim.
-Search vim's manual for "remote" to find these.
+Vim's server is called VV by default. There are several remote options for Vim.
+Search Vim's manual for "remote" to find these.
 ```
-man vim
+man Vim
 ```
-The simplest way to add new functions is to modify the vifm-start and vim-start
+The simplest way to add new functions is to modify the vifm-start and Vim-start
 files and bind keys to the commands. Look inside vifm-start and study the
 script to see my style for this.
 
 known issues
 ====
 
-cd commands are still visible in vifm's command history. vim sometimes renders
+cd commands are still visible in vifm's command history. Vim sometimes renders
 incorrectly, always on the first run and usually with remotely opening large
 files; this can be fixed by reconnecting.
