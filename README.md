@@ -2,14 +2,15 @@ envi
 ====
 
 A dynamic file-passing and auto navigation bash script for vifm, Vim, and a
-shell. It uses tmux for servers. It is invisible in the shell; no navigation
-commands are shown. It is fairly extensible through rebindings. More
-modularity is coming through updates. envi exists because of the efficiency of
-working with the three major abstractions of data separately; text, programs,
-and directories. I didn't want ugly slow addons in Vim for navigation, or have
-to close Vim to open multiple files or navigate. I often found myself opening
-all three of the programs envi uses together, because vifm opens files in Vim
-automatically and I often wanted to see extra information in my shell.
+shell written in bash. It uses tmux for servers. It is invisible in the shell;
+no navigation commands are shown. It is fairly extensible through rebindings.
+More modularity is coming through updates. envi exists because of the efficiency
+of working with the three major abstractions of data separately; text,
+programs, and directories. I didn't want ugly slow addons in Vim for
+navigation, or have to close Vim to open multiple files or navigate. I often
+found myself opening all three of the programs envi uses together, because vifm
+opens files in Vim automatically and I often wanted to see extra information in
+my shell.
 
 dependencies
 ====
@@ -34,7 +35,7 @@ will be set automatically. Text files will be opened automatically in Vim.
 Unknown file types are outputted to $HOME/.envi/unknown and then opened
 normally in vifm so that you can modify the behaviour. Behaviour of Vim and
 vifm on initialization (rebindings, etc) can be set inside
-$HOME/.envi/vifm-start and $HOME/.envi/Vim-start. Quitting inside of Vim with
+$HOME/.envi/vifm-start and $HOME/.envi/vim-start. Quitting inside of Vim with
 ZZ causes all the programs to exit. If you "lose" a server, need to reload
 configs, or accidentally closed it, run envi again; servers that
 were already open will reconnect, and missing servers will be created anew
@@ -72,9 +73,9 @@ vim --servername VV --remote-send (keys)
 Vim's server is called VV by default. There are several remote options for Vim.
 Search Vim's manual for "remote" to find these.
 ```
-man Vim
+man vim
 ```
-The simplest way to add new functions is to modify the vifm-start and Vim-start
+The simplest way to add new functions is to modify the vifm-start and vim-start
 files and bind keys to the commands. Look inside the files and study the source
 of envi to see my style for this.
 
