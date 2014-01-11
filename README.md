@@ -29,11 +29,11 @@ emulator, place your terminal and an argument that runs commands in the
 operation
 ====
 
-Use h and l to move normally in vifm. Working directory of Vim and your shell
-will be set automatically. Text files will be opened automatically in Vim.
-Unknown file types are outputted to $HOME/.envi/unknown and then opened
-normally in vifm so that you can modify the behaviour. Behaviour of Vim and
-vifm on initialization (rebindings, etc) can be set inside
+Use h and l to navigate normally in vifm. Working directory of Vim and your
+shell will be set automatically. Text files will be opened automatically in
+Vim. Unknown file types are outputted to $HOME/.envi/unknown and then opened
+normally in vifm so that you can modify the behaviour later. Behaviour of Vim
+and vifm on initialization (rebindings, etc) can be set inside
 $HOME/.envi/vifm-start and $HOME/.envi/vim-start. Quitting inside of Vim with
 ZZ causes all the programs to exit. If you "lose" a server, need to reload
 configs, or accidentally closed it, run envi again; servers that
@@ -83,4 +83,4 @@ known issues
 
 cd commands are still visible in vifm's command history. Vim sometimes renders
 incorrectly, always on the first run and usually with remotely opening large
-files; this can be fixed by reconnecting.iles; this can be fixed by reconnecting.
+files; this can be fixed by reconnecting.
