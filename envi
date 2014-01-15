@@ -22,9 +22,9 @@ main()
             open_with_ipc "-O"
         done
     elif [ "$1" == "-q" ]; then
-        tmux kill-session -t$tmux_servername;
-        tmux kill-session -t$vifm_servername;
+        tmux kill-session -t$vifm_servername
         tmux kill-session -t$tvim_servername
+        tmux kill-session -t$tmux_servername
     elif [ "$1" == "-i" ]; then
         invisible_cmd "${@:2}"
     elif [ "$1" == "--c-f" ]; then
