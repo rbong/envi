@@ -115,7 +115,7 @@ make_vifm_start_config()
         "nnoremap l : execute '!! $prog -l %c &' <cr>\n"\
         "nnoremap h : execute '!! $prog -h \$(dirname %d) &' <cr>\n"\
         "nnoremap ~ : execute '!! $prog -o ~ &' <cr>\n"\
-        "nnoremap ZQ : execute '!! $prog -q vifm &' <cr>\n'"\
+        "nnoremap ZQ : execute '!! $prog -q vifm &' <cr>\n"\
         > $basedir/vifm-start
 }
 make_vim_start_config()
