@@ -22,9 +22,7 @@ main()
             open_with_ipc "-O"
         done
     elif [ "$1" == "-q" ]; then
-        tmux kill-session -t$vifm_servername
-        tmux kill-session -t$tvim_servername
-        tmux kill-session -t$tmux_servername
+        quit "$2"
     elif [ "$1" == "-i" ]; then
         invisible_cmd "${@:2}"
     elif [ "$1" == "--c-f" ]; then
@@ -117,13 +115,14 @@ make_vifm_start_config()
         "nnoremap l : execute '!! $prog -l %c &' <cr>\n"\
         "nnoremap h : execute '!! $prog -h \$(dirname %d) &' <cr>\n"\
         "nnoremap ~ : execute '!! $prog -o ~ &' <cr>\n"\
+        "nnoremap ZQ : execute '!! $prog -q vifm &' <cr>\n'"\
         > $basedir/vifm-start
 }
 make_vim_start_config()
 {
     printf "%b" "nnoremap ZZ : "\
         "wa \| "\
-        "silent !$prog -q<cr>"\
+        "silent !$prog -q vim &<cr>"\
         > $basedir/vim-start.vim
 }
 
@@ -254,6 +253,22 @@ clean_vim()
     for i in " " \( \) \{ \} \[ \] \' \" \\; do
         dirname_clean_vim=${dirname_clean_vim//$i/\\$i}
     done
+}
+quit()
+{
+    if [ "$1" == "vim" ]; then
+        tmux kill-session -t$tmux_servername
+        tmux kill-session -t$vifm_servername
+        tmux kill-session -t$tvim_servername
+    elif [ "$1" == "vifm" ]; then
+        tmux kill-session -t$tvim_servername
+        tmux kill-session -t$tmux_servername
+        tmux kill-session -t$vifm_servername
+    else
+        tmux kill-session -t$tvim_servername
+        tmux kill-session -t$vifm_servername
+        tmux kill-session -t$tmux_servername
+    fi
 }
 
 # exit if duplicates running
