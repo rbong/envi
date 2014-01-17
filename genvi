@@ -1,0 +1,106 @@
+#!/bin/bash
+prog="genvi"
+basedir="$HOME/.envi"
+outfile="$basedir/.gdb"
+vim_servername=vvim
+tvim_servername=tvim
+gdb_servername=tgdb
+timeout=500
+extra="0.05"
+
+main()
+{
+    checks
+    start_server "$@"
+    gdb_dir=$PWD
+    out=$(grep -v "Gdb's prompt is " < $outfile)
+    prompt=1
+    printf "$out"
+    while read input; do
+        printf "" > $outfile
+        sleep $extra
+        if [ "$input" == "quit" -o "$input" == "q" ]; then break; fi
+        if [ "$input" != "" ]; then
+            last=$input
+            tmux send-keys -t$gdb_servername "$input" Enter
+        elif [ $prompt -eq 1 ]; then
+            tmux send-keys -t$gdb_servername "$last" Enter
+        else
+            tmux send-keys -t$gdb_servername Enter
+        fi
+
+        sleep $extra
+        out=$(< $outfile)
+        out=${out/$input/}
+        printf "$out"
+        if [ "$(printf "$out" | tail -n 1)" == "$gdb_prompt" ]; then
+            prompt=1
+            printf "" > $outfile
+            tmux send-keys -t$gdb_servername "where" Enter
+            sleep $extra
+            end=$(grep --text "#0" "$outfile")
+            if [ "$end" == "" ]; then continue; fi
+            end=${end##* }
+            linenum=${end#*:}
+            filename=$gdb_dir"/"${end%:*}
+            if [ -f "$filename" ]; then
+                vim --servername $vim_servername --remote-tab-silent "$filename"
+                sleep $extra
+                vim --servername $vim_servername --remote-send \
+                    $linenum"Gzo<esc>V"
+            fi
+        else
+            prompt=0
+        fi
+    done
+    quit
+}
+
+checks()
+{
+    # exit if duplicates running
+    if [ $(pgrep $prog|wc -l) -gt 2 ]; then
+        exit
+    fi
+
+    if ! tmux has-session -t$tvim_servername; then
+        exit
+    fi
+
+}
+
+start_server()
+{
+    tmux new-session -d -s $gdb_servername 
+    tmux send-keys -t$gdb_servername \
+    " gdb -ex \"show prompt\" $@ 1> $outfile 2> $outfile" Enter
+    # normal output catching doesn't seem to work
+    wait_for_file .gdb
+    gdb_prompt=$(grep "Gdb's prompt is " $outfile | cut -d\" -f 2-2)
+}
+
+wait_for_file()
+{
+    t=$timeout
+    while [ $t -gt 0 -a ! -f $basedir/$@ ]; do
+        t=$(expr $t - 1)
+        sleep 0.001s
+    done
+    if [ $t -eq 0 ]; then
+        echo "$prog error: timeout"
+        quit
+    fi
+    sleep "$extra"
+}
+
+quit()
+{
+    rm -f "$outfile" &> /dev/null
+    vim --servername $vim_servername --remote-send "<esc>"
+    tmux send-keys -t$gdb_servername " quit" Enter
+    tmux kill-session -t$gdb_servername
+    exit
+}
+
+if [ "$1" == "-q" ]; then quit; fi
+main "$@"

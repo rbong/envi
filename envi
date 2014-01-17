@@ -2,10 +2,10 @@
 prog="envi"
 basedir="$HOME/.$prog"
 terminal="st -e"
-vim_servername=VV
-tvim_servername=V2
-tmux_servername=VT
-vifm_servername=VF
+vim_servername=vvim
+tvim_servername=tvim
+bash_servername=tbsh
+vifm_servername=tvif
 
 #init functions
 main()
@@ -25,14 +25,17 @@ main()
         quit "$2"
     elif [ "$1" == "-i" ]; then
         invisible_cmd "${@:2}"
+    elif ["$1" == "-v" ]; then
+        filename=$i
+        open_file
     elif [ "$1" == "--c-f" ]; then
         dirname_clean_vifm=$(readlink -f "${@:2}")
         clean_vifm
         echo $dirname_clean_vifm
     elif [ "$1" == "--c-t" ]; then
-        dirname_clean_tmux=$(readlink -f "${@:2}")
-        clean_tmux
-        echo $dirname_clean_tmux
+        dirname_clean_bash=$(readlink -f "${@:2}")
+        clean_bash
+        echo $dirname_clean_bash
     elif [ "$1" == "--c-v" ]; then
         dirname_clean_vim=$(readlink -f "${@:2}")
         clean_vim
@@ -66,10 +69,10 @@ find_servers()
     fi
     sleep 0.05s
 
-    if ! tmux has-session -t$tmux_servername; then
-        start_tmux_server
+    if ! tmux has-session -t$bash_servername; then
+        start_bash_server
     else
-        detach_tmux_server
+        detach_bash_server
     fi
     sleep 0.05s
 
@@ -96,14 +99,11 @@ open_with_ipc()
             tmux send-keys -t$vifm_servername "\\l"
         fi
         open_directory
-        dir=true
     elif egrep -q -i '(text|data)' <<< "$file_format"; then
         sleep 0.01
         open_file
-        text=true
     else
         open_unknown
-        other=true
     fi
 }
 
@@ -139,10 +139,10 @@ start_vim_server()
         "   vim --servername $vim_servername -c $vim_start_options" C-m
     $terminal tmux attach-session -d -t$tvim_servername &
 }
-start_tmux_server()
+start_bash_server()
 {
-    tmux new-session -d -s $tmux_servername
-    $terminal tmux attach-session -d -t$tmux_servername &
+    tmux new-session -d -s $bash_servername
+    $terminal tmux attach-session -d -t$bash_servername &
 }
 start_vifm_server()
 {
@@ -159,17 +159,17 @@ detach_vifm_server()
     tmux detach-client -s$vifm_servername
     $terminal tmux attach-session -d -t$vifm_servername &
 }
-detach_tmux_server()
+detach_bash_server()
 {
     tmux detach-client -s$vifm_servername
-    tmux detach-client -s$tmux_servername
-    $terminal tmux attach-session -d -t$tmux_servername &
+    tmux detach-client -s$bash_servername
+    $terminal tmux attach-session -d -t$bash_servername &
 }
 detach_vim_server()
 {
     tmux detach-client -s$tvim_servername
     tmux detach-client -s$vifm_servername
-    tmux detach-client -s$tmux_servername
+    tmux detach-client -s$bash_servername
     $terminal tmux attach-session -d -t$tvim_servername &
 }
 
@@ -181,12 +181,12 @@ open_directory()
     # this is a pain to debug, and I don't trust it to work for anyone but me
 
     dirname_clean_vim=$(readlink -f "$filename")
-    dirname_clean_tmux=$dirname_clean_vim
+    dirname_clean_bash=$dirname_clean_vim
     echo $dirname_clean_vim &> $basedir/.last # set initial folder if we close
 
     # change tmux directory
-    clean_tmux
-    invisible_cmd "cd $dirname_clean_tmux"
+    clean_bash
+    invisible_cmd "cd $dirname_clean_bash"
 
     # change Vim directory
     clean_vim
@@ -213,20 +213,24 @@ open_unknown()
 }
 
 #utility functions
-invisible_cmd()
+invisible_cmd() # probably won't work for anything but "cd" commands
 {
     # preserve state, change directory, remain "invisible" on terminal emulator
     # works with either key mode set in bash. stty -echo may not work in zsh
     # see: $ man stty $ man console_codes $ man bash $ man bg
-    tmux send-keys -t$tmux_servername C-z Escape C-s Escape C-a Home  "II " \
+    tmux send-keys -t$bash_servername C-z Escape C-s Escape C-a Home  "II " \
         End C-u "  stty -echo" Enter \
-        "   $@; fg &> $basedir/fg" Enter C-q 
-    while [ ! -f $basedir/fg ]; do sleep 0.001; done
+        "   $@; fg &> $basedir/fg" Enter C-q
+    timeout=500
+    while [ ! -f $basedir/fg -a $timeout -gt 0 ]; do
+        sleep 0.001
+        timeout=$(expr $timeout - 1)
+    done
     if [ "$(cat $basedir/fg)" != "-bash: fg: current: no such job" ]; then
-        tmux send-keys -t$tmux_servername C-z \
+        tmux send-keys -t$bash_servername C-z \
             "   stty echo; printf '\e[3F\e[J'; fg > /dev/null" Enter
     else
-        tmux send-keys -t$tmux_servername \
+        tmux send-keys -t$bash_servername \
             "   stty echo; printf '\e[F\e[J'" Enter \
             C-y Home M-d C-d Escape x Escape x End Escape A C-q
     fi
@@ -240,11 +244,11 @@ clean_vifm()
     done
     dirname_clean_vifm=${dirname_clean_vifm//$/\$\$}
 }
-clean_tmux()
+clean_bash()
 {
-    dirname_clean_tmux=${dirname_clean_tmux//\/\\\\}
+    dirname_clean_bash=${dirname_clean_bash//\/\\\\}
     for i in " "  \$ \( \) \' \" \&; do
-        dirname_clean_tmux=${dirname_clean_tmux//$i/\\$i}
+        dirname_clean_bash=${dirname_clean_bash//$i/\\$i}
     done
 }
 clean_vim()
@@ -257,19 +261,25 @@ clean_vim()
 quit()
 {
     if [ "$1" == "vim" ]; then
-        tmux kill-session -t$tmux_servername
+        tmux kill-session -t$bash_servername
         tmux kill-session -t$vifm_servername
         tmux kill-session -t$tvim_servername
     elif [ "$1" == "vifm" ]; then
         tmux kill-session -t$tvim_servername
-        tmux kill-session -t$tmux_servername
+        tmux kill-session -t$bash_servername
         tmux kill-session -t$vifm_servername
     else
         tmux kill-session -t$tvim_servername
         tmux kill-session -t$vifm_servername
-        tmux kill-session -t$tmux_servername
+        tmux kill-session -t$bash_servername
     fi
 }
+
+if [ "$1" == "-g" ]; then
+    genvi -q
+    genvi "${@:2}"
+    exit
+fi
 
 # exit if duplicates running
 if [ $(pgrep $prog|wc -l) -gt 2 ]; then
