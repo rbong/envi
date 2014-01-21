@@ -112,9 +112,9 @@ make_vifm_start_config()
 {
     printf "%b" "noremap \\l : normal! l<cr>\n"\
         "noremap \\h : normal! h<cr>\n"\
-        "nnoremap l : execute '!! $prog -l %c &' <cr>\n"\
-        "nnoremap h : execute '!! $prog -h \$(dirname %d) &' <cr>\n"\
-        "nnoremap ~ : execute '!! $prog -o ~ &' <cr>\n"\
+        "nnoremap l : execute '!! $prog -l \"%c\" &' <cr>\n"\
+        "nnoremap h : execute '!! $prog -h \"\$(dirname %d)\" &' <cr>\n"\
+        "nnoremap ~ : execute '!! $prog -o \"~\" &' <cr>\n"\
         "nnoremap ZQ : execute '!! $prog -q vifm &' <cr>\n"\
         > $basedir/vifm-start
 }
@@ -176,11 +176,10 @@ detach_vim_server()
 # inter process functions
 open_directory()
 {
-    # Vifm bash, and Vifm all hate different characters
-    # syntax is ${variable//search/replace} (this was clearer than regex)
-    # this is a pain to debug, and I don't trust it to work for anyone but me
-
     dirname_clean_vim=$(readlink -f "$filename")
+    if [ ! -d "$dirname_clean_vim" ]; then
+        return
+    fi
     dirname_clean_bash=$dirname_clean_vim
     echo $dirname_clean_vim &> $basedir/.last # set initial folder if we close
 
@@ -197,6 +196,9 @@ open_directory()
 open_directory_vifm()
 {
     dirname_clean_vifm=$(readlink -f "$filename")
+    if [ ! -d "$dirname_clean_vifm" ]; then
+        return
+    fi
     clean_vifm
     tmux send-keys -t$vifm_servername Escape ":  cd $dirname_clean_vifm"
     sleep 0.1 # fix problem on initialization
@@ -247,14 +249,14 @@ clean_vifm()
 clean_bash()
 {
     dirname_clean_bash=${dirname_clean_bash//\/\\\\}
-    for i in " "  \$ \( \) \' \" \&; do
+    for i in " " \; \$ \( \) \' \" \&; do
         dirname_clean_bash=${dirname_clean_bash//$i/\\$i}
     done
 }
 clean_vim()
 {
     dirname_clean_vim=${dirname_clean_vim//\\/\\\\}
-    for i in " " \( \) \{ \} \[ \] \' \" \\; do
+    for i in " " \| \# \% \( \) \{ \} \[ \] \' \" \\; do
         dirname_clean_vim=${dirname_clean_vim//$i/\\$i}
     done
 }
