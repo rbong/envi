@@ -6,8 +6,9 @@ envi
 Envi is basically a small IDE written in bash. It ties together existing tools
 like vim, vifm (a vi-like file manager), and a shell. Its strongest feature is
 automatic and invisible directory changing and text file passing while
-navigating with vifm. It is extensible through its tmux servers by merely
-sending keys.
+navigating with vifm. If it seems hard to see what it does, you would be right.
+You will never think about navigation again.
+It is extensible through its tmux servers by merely sending keys.
 
 dependencies
 ====
@@ -41,10 +42,10 @@ full.
 operation
 ====
 
-hjkl navigates in vifm. Working directory of Vim and your
-shell will be set automatically. Text can be typed in bash, or programs can be
-opened wihtout any interruption to normal function or loss of data in bash or
-the script. Text files will be opened automatically in
+hjkl navigates in vifm, and keys work the way you would expect them to based on
+vi(m) bindings (d, m/', f/F/t/T etc). Working directory of Vim and your
+shell will be set automatically. Text typed in bash is untouched as its
+directory is changed. Text files will be opened automatically in
 Vim. Unknown file types are outputted to $HOME/.envi/unknown and then opened
 normally in vifm so that you can modify the behaviour later. Behaviour of Vim
 and vifm on initialization (rebindings, etc) can be set inside
@@ -69,26 +70,36 @@ used to make sure that servers are initialized to avoid expensive loops. envi
 is not written for other computers, and if it behaves strangely you should
 increase the length of the sleep commands or write loops that ask tmux if the
 servers exist yet; this still might not work. See the script for some of the
-"creative" methods used. envi will work best on a light system. Even though
+"creative" methods used. Please do not change these; they are based on trial
+and error. envi will work best on a light system. Even though
 it's a personal script, feel free to submit issues if you experience any
 problems.
+
+genvi
+====
+
+envi's gdb interface is called genvi. Call it with any options you want to pass
+to gdb. File location will not be shown. Line number will automatically be
+highlighted in Vim as it would be with gdb's textual user interface mode,
+without any of the eccentricities.
 
 modifying
 ====
 
 When you are modifying, most extension should be done by sending keys through
-the servers. The default names of the servers are V2 for Vim's tmux server, VT
-for the shell's server, and VF for vifm's server. You can access these with
+the servers. The default names of the servers are tvim for Vim's tmux server,
+tbsh for the shell's server, and tvif for vifm's server. You can access these
+with
 ```
 tmux send-keys -t(servername) (keys)
 ```
 Vim's built in server capabilities are also used. A tmux server is only used
 because Vim does not support reconnection. Vim's server can be accessed with
 ```
-vim --servername VV --remote-send (keys)
+vim --servername vvim --remote-send (keys)
 ```
-Vim's server is called VV by default. There are several remote options for Vim.
-Search Vim's manual for "remote" to find these.
+Vim's server is called vvim by default. There are several remote options for
+Vim.  Search Vim's manual for "remote" to find these.
 ```
 man vim
 ```
