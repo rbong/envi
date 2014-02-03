@@ -1,14 +1,20 @@
 [video](https://github.com/rbong/envi/raw/master/video/ipc.mkv)
+In this video, you can see the programs opening together, changing directory
+together, and not interrupting eachother. I demonstrate how text and programs
+opened in the shell are not disturbed. I demonstrate how opening files in
+the file manager opens them in vim. I show the debugging capabilities. I show
+its reconnection abilities by switching workspaces and then running the script
+again. I also close the programs entirely and then reconnect them. Finally, I
+show them quitting together.
 
 envi
 ====
 
 Envi is basically a small IDE written in bash. It ties together existing tools
-like vim, vifm (a vi-like file manager), and a shell. Its strongest feature is
-automatic and invisible directory changing and text file passing while
-navigating with vifm. If it seems hard to see what it does, you would be right.
-You will never think about navigation again.
-It is extensible through its tmux servers by merely sending keys.
+like vim, vifm (a vi-like file manager), and a shell. It provides a full shell
+and file manager to vim without any of the quirks and lacking features of
+plugins that do the same. It is extensible through its tmux servers by merely
+sending keys.
 
 dependencies
 ====
