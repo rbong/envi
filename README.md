@@ -10,9 +10,9 @@ show them quitting together.
 envi
 ====
 
-Envi is basically a small IDE written in bash. It ties together existing tools
-like vim, vifm (a vi-like file manager), and a shell. It provides a full shell
-and file manager to vim without any of the quirks and lacking features of
+Envi is a small programming tool written in bash. It ties together existing
+tools like vim, vifm (a vi-like file manager), and a shell. It provides a full
+shell and file manager to vim without any of the quirks and lacking features of
 plugins that do the same. It is extensible through its tmux servers by merely
 sending keys.
 
