@@ -1,8 +1,6 @@
 vim_servername=vvim
 out=~/.envi/.gdbout
 
-echo "" > ~/out
-
 if [ ! -p $out ]; then
     mkfifo $out
 fi
@@ -13,9 +11,7 @@ parse()
     head=${head:0:2}
     if [ "$head"  == "" ]; then
         line=$(echo $@ | cut -c 3-)
-        echo "LINE - $line" >> ~/out
         file=${line%%:*}
-        echo "FILE - $file" >> ~/out
         if [ "$file" != "" -a -f "$file" ]; then
             vim --servername $vim_servername --remote $file
         else
@@ -23,7 +19,6 @@ parse()
         fi
         linenum=${line#*:}
         linenum=${linenum%%:*}
-        echo "LINENO - $linenum" >> ~/out
         if [ "$linenum" -eq "$linenum" ] 2> /dev/null; then
             vim --servername $vim_servername --remote-send \
                 "<esc>"$linenum"GzozzV"
