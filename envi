@@ -34,21 +34,19 @@ main()
     elif [ "$1" == "--c-f" ]; then
         filename="${@:2}"
         unclean
-        # dirname_clean_vifm=$(readlink -f "$filename")
+        dirname_clean_vifm=$(readlink -f "$filename")
         clean_vifm
         echo $dirname_clean_vifm
     elif [ "$1" == "--c-t" ]; then
         filename="${@:2}"
         unclean
-        # dirname_clean_bash=$(readlink -f "$filename")
-        dirname_clean_bash=$filename
+        dirname_clean_bash=$(readlink -f "$filename")
         clean_bash
         echo $dirname_clean_bash
     elif [ "$1" == "--c-v" ]; then
         filename="${@:2}"
         unclean
-        # dirname_clean_vim=$(readlink -f "$filename")
-        dirname_clean_vim=$filename
+        dirname_clean_vim=$(readlink -f "$filename")
         clean_vim
         echo $dirname_clean_vim
     fi
@@ -207,8 +205,7 @@ open_directory()
 }
 open_directory_vifm()
 {
-    # dirname_clean_vifm=$(readlink -f "$filename")
-    dirname_clean_vifm=$filename
+    dirname_clean_vifm=$(readlink -f "$filename")
     if [ ! -d "$dirname_clean_vifm" ]; then
         return
     fi
