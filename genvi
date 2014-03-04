@@ -19,7 +19,6 @@ parse()
         fi
         linenum=${line#*:}
         linenum=${linenum%%:*}
-        echo "LINENO - $linenum" >> ~/out
         if [ "$linenum" -eq "$linenum" ] 2> /dev/null; then
             vim --servername $vim_servername --remote-send \
                 "<esc>"$linenum"GzozzV"
