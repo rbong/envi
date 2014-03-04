@@ -103,6 +103,7 @@ open_with_ipc()
     if egrep -q '(directory|link)' <<< "$file_format"; then
         if [ "$1" == "-o" -o "$1" == "-O" ]; then
             open_directory_vifm
+    dirname_clean_vim=$(readlink -f "$filename")
         elif [ "$1" == "-h" ]; then
             tmux send-keys -t$vifm_servername "\\h"
         elif [ "$1" == "-l" ]; then
@@ -186,7 +187,7 @@ detach_vim_server()
 # inter process functions
 open_directory()
 {
-    dirname_clean_vim=$filename
+    dirname_clean_vim=$(readlink -f "$filename")
     if [ ! -d "$dirname_clean_vim" ]; then
         return
     fi
@@ -253,6 +254,7 @@ unclean()
     filename=${filename//"\\ "/ }
     filename=${filename//"\\("/(}
     filename=${filename//"\\)"/)}
+    filename=${filename//"\\'"/\'}
 }
 clean_vifm()
 {
