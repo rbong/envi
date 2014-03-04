@@ -15,29 +15,40 @@ main()
         find_servers
     elif [ "$1" == "-o" -o "$1" == "-h" -o "$1" == "-l" ]; then
         filename="${@:2}"
+        unclean
         open_with_ipc "$1"
     elif [ "$1" == "-O" ]; then
+        command="<esc>:"
         for i in "${@:2}"; do
-            filename=$i
-            open_with_ipc "-O"
+            command=$command"tabe $i | "
         done
+        vim --servername $vim_servername --remote-send "$command<CR>"
     elif [ "$1" == "-q" ]; then
         quit "$2"
     elif [ "$1" == "-i" ]; then
         invisible_cmd "${@:2}"
-    elif ["$1" == "-v" ]; then
-        filename=$i
+    elif [ "$1" == "-v" ]; then
+        filename="${@:2}"
+        unclean
         open_file
     elif [ "$1" == "--c-f" ]; then
-        dirname_clean_vifm=$(readlink -f "${@:2}")
+        filename="${@:2}"
+        unclean
+        # dirname_clean_vifm=$(readlink -f "$filename")
         clean_vifm
         echo $dirname_clean_vifm
     elif [ "$1" == "--c-t" ]; then
-        dirname_clean_bash=$(readlink -f "${@:2}")
+        filename="${@:2}"
+        unclean
+        # dirname_clean_bash=$(readlink -f "$filename")
+        dirname_clean_bash=$filename
         clean_bash
         echo $dirname_clean_bash
     elif [ "$1" == "--c-v" ]; then
-        dirname_clean_vim=$(readlink -f "${@:2}")
+        filename="${@:2}"
+        unclean
+        # dirname_clean_vim=$(readlink -f "$filename")
+        dirname_clean_vim=$filename
         clean_vim
         echo $dirname_clean_vim
     fi
@@ -84,6 +95,7 @@ find_servers()
     sleep 0.10s
 
     filename=$(cat $basedir/.last)
+    unclean
     open_directory
     open_directory_vifm
 }
@@ -176,7 +188,7 @@ detach_vim_server()
 # inter process functions
 open_directory()
 {
-    dirname_clean_vim=$(readlink -f "$filename")
+    dirname_clean_vim=$filename
     if [ ! -d "$dirname_clean_vim" ]; then
         return
     fi
@@ -195,7 +207,8 @@ open_directory()
 }
 open_directory_vifm()
 {
-    dirname_clean_vifm=$(readlink -f "$filename")
+    # dirname_clean_vifm=$(readlink -f "$filename")
+    dirname_clean_vifm=$filename
     if [ ! -d "$dirname_clean_vifm" ]; then
         return
     fi
@@ -237,6 +250,12 @@ invisible_cmd() # probably won't work for anything but "cd" commands
             C-y Home M-d C-d Escape x Escape x End Escape A C-q
     fi
     rm $basedir/fg -f
+}
+unclean()
+{
+    filename=${filename//"\\ "/ }
+    filename=${filename//"\\("/(}
+    filename=${filename//"\\)"/)}
 }
 clean_vifm()
 {
