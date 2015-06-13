@@ -293,6 +293,7 @@ quit()
         tmux kill-session -t$vifm_servername
         tmux kill-session -t$bash_servername
     fi
+    pkill -5 vim
 }
 
 if [ "$1" == "-g" ]; then

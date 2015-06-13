@@ -1,15 +1,21 @@
 vim_servername=vvim
-out=~/.envi/.gdbout
+out=~/.envi/$$
 
 if [ ! -p $out ]; then
     mkfifo $out
 fi
+
+rm -f /tmp/.vim &> /dev/null
 
 parse()
 {
     head=$@
     head=${head:0:2}
     if [ "$head"  == "" ]; then
+        while [ -f /tmp/.vim ]; do
+            sleep .1
+        done
+        touch /tmp/.vim
         line=$(echo $@ | cut -c 3-)
         file=${line%%:*}
         if [ "$file" != "" -a -f "$file" ]; then
@@ -23,6 +29,7 @@ parse()
             vim --servername $vim_servername --remote-send \
                 "<esc>"$linenum"GzozzV"
         fi
+        rm -f /tmp/.vim &> /dev/null
     fi
 }
 while true; do
