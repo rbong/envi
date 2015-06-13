@@ -25,6 +25,8 @@ the debugging features. The script may not match your use, as it's not meant
 for public usage. For example- lsview will not work well in vifm, programs are
 opened in my preferred order.
 
+It also requires Vim to be compiled with clientserver capabilities.
+
 installation
 ====
 
