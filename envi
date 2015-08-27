@@ -1,7 +1,7 @@
 #!/bin/bash
 prog="envi"
 basedir="$HOME/.$prog"
-terminal="st -e"
+terminal="urxvt -e"
 vim_servername=vvim
 tvim_servername=tvim
 bash_servername=tbsh
@@ -152,7 +152,7 @@ start_vim_server()
 }
 start_bash_server()
 {
-    tmux new-session -d -s $bash_servername
+    tmux new-session -d -s $bash_servername zsh
     $terminal tmux attach-session -d -t$bash_servername &
 }
 start_vifm_server()
@@ -231,23 +231,26 @@ invisible_cmd() # probably won't work for anything but "cd" commands
     # preserve state, change directory, remain "invisible" on terminal emulator
     # works with either key mode set in bash. stty -echo may not work in zsh
     # see: $ man stty $ man console_codes $ man bash $ man bg
-    tmux send-keys -t$bash_servername C-z Escape C-s Escape C-a Home  "II " \
-        End C-u "  stty -echo" Enter \
-        "   $@; fg &> $basedir/fg" Enter C-q
-    timeout=500
-    while [ ! -f $basedir/fg -a $timeout -gt 0 ]; do
-        sleep 0.001
-        timeout=$(expr $timeout - 1)
-    done
-    if [ "$(cat $basedir/fg)" != "-bash: fg: current: no such job" ]; then
-        tmux send-keys -t$bash_servername C-z \
-            "   stty echo; printf '\e[3F\e[J'; fg > /dev/null" Enter
-    else
-        tmux send-keys -t$bash_servername \
-            "   stty echo; printf '\e[F\e[J'" Enter \
-            C-y Home M-d C-d Escape x Escape x End Escape A C-q
-    fi
-    rm $basedir/fg -f
+    # tmux send-keys -t$bash_servername C-z Escape C-s Escape C-a Home  "II " \
+    #     End C-u "  stty -echo" Enter \
+    #     "   $@; fg &> $basedir/fg" Enter C-q
+    # timeout=500
+    # while [ ! -f $basedir/fg -a $timeout -gt 0 ]; do
+    #     sleep 0.001
+    #     timeout=$(expr $timeout - 1)
+    # done
+    # if [ "$(cat $basedir/fg)" != "fg: current: no such job" ]; then
+    #     tmux send-keys -t$bash_servername C-z \
+    #         "   stty echo; printf '\e[3F\e[J'; fg > /dev/null" Enter
+    # else
+    #     tmux send-keys -t$bash_servername \
+    #         "   stty echo; printf '\e[F\e[J'" Enter \
+    #         C-y Home M-d C-d Escape x Escape x End Escape A C-q
+    # fi
+    # rm $basedir/fg -f
+    tmux send-keys -t$bash_servername C-z Escape "cc$@; fg; clear; zsh -c \"exit 0\"" Enter
+    sleep 0.1
+    sed -i '$ d' ~/.zsh_history
 }
 unclean()
 {
