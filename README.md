@@ -7,7 +7,7 @@ envi
 ====
 
 * Shares active directory between discrete sessions of vim, vifm (vi file manager), and fish (friendly shell)
-* Files opened in the filemanager are opened in vim
+* Files opened in the file manager are opened in vim
 * Provides a shell/file manager to vim without quirks/limitations
 * The current location of gdb is opened in vim
 * Provided as an example for personal interprocess communication systems
@@ -32,7 +32,7 @@ sudo make install
 operation
 ====
 
-## Vvifm
+## vifm
 
 Command/Keybinding | Operation
 -------------------|----------
