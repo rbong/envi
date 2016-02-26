@@ -2,119 +2,43 @@
 prog="envi"
 basedir="$HOME/.$prog"
 terminal="urxvt -e"
-vim_servername=vvim
-tvim_servername=tvim
-bash_servername=tbsh
-vifm_servername=tvif
+vim_servername=envi
+sh_servername=envi
+vifm_servername=envi
+vim_cmd=envim
+vifm_cmd=envifm
+fish_cmd=envish
 
 #init functions
 main()
 {
-    if [ -z "$1" ]; then
-        make_configs
-        find_servers
-    elif [ "$1" == "-o" -o "$1" == "-h" -o "$1" == "-l" ]; then
-        filename="${@:2}"
-        unclean
-        open_with_ipc "$1"
-    elif [ "$1" == "-O" ]; then
-        command="<esc>:"
-        for i in "${@:2}"; do
-            command=$command"tabe $i | "
-        done
-        vim --servername $vim_servername --remote-send "$command<CR>"
-    elif [ "$1" == "-q" ]; then
-        quit "$2"
-    elif [ "$1" == "-i" ]; then
-        invisible_cmd "${@:2}"
-    elif [ "$1" == "-v" ]; then
-        filename="${@:2}"
-        unclean
-        open_file
-    elif [ "$1" == "--c-f" ]; then
-        filename="${@:2}"
-        unclean
-        dirname_clean_vifm=$(readlink -f "$filename")
-        clean_vifm
-        echo $dirname_clean_vifm
-    elif [ "$1" == "--c-t" ]; then
-        filename="${@:2}"
-        unclean
-        dirname_clean_bash=$(readlink -f "$filename")
-        clean_bash
-        echo $dirname_clean_bash
-    elif [ "$1" == "--c-v" ]; then
-        filename="${@:2}"
-        unclean
-        dirname_clean_vim=$(readlink -f "$filename")
-        clean_vim
-        echo $dirname_clean_vim
-    fi
+    make_configs
+    find_servers
 }
 make_configs()
 {
     if [ ! -d $basedir ]; then
+        rm -rf "$basedir"
         mkdir "$basedir"
-    fi
-    if [ ! -f $basedir/vifm-start ]; then
         make_vifm_start_config
-    fi
-    if [ ! -f $basedir/vim-start.vim ]; then
         make_vim_start_config
-    fi
-    if [ ! -f $basedir/.last ]; then
-        echo "~" > $basedir/.last
+        make_sh_start_config
+        make_tmux_start_config
     fi
 }
 find_servers()
 {
-    if ! tmux has-session -t$tvim_servername; then
+    if ! pidof envim; then
         start_vim_server
-        # fix problems with screen drawing
-        sleep 0.1s
-        detach_vim_server
-    else
-        detach_vim_server
+        sleep 0.05
     fi
-    sleep 0.05s
-
-    if ! tmux has-session -t$bash_servername; then
-        start_bash_server
-    else
-        detach_bash_server
+    if ! tmux has-session -t$sh_servername; then
+        start_sh_server
+        sleep 0.05
     fi
-    sleep 0.05s
-
-    if ! tmux has-session -t$vifm_servername; then
+    if ! pidof envifm; then
         start_vifm_server
-    else
-        detach_vifm_server
-    fi
-    sleep 0.10s
-
-    filename=$(cat $basedir/.last)
-    unclean
-    open_directory
-    open_directory_vifm
-}
-open_with_ipc()
-{
-    file_format=$(file "$filename")
-    if egrep -q '(directory|link)' <<< "$file_format"; then
-        if [ "$1" == "-o" -o "$1" == "-O" ]; then
-            open_directory_vifm
-    dirname_clean_vim=$(readlink -f "$filename")
-        elif [ "$1" == "-h" ]; then
-            tmux send-keys -t$vifm_servername "\\h"
-        elif [ "$1" == "-l" ]; then
-            tmux send-keys -t$vifm_servername "\\l"
-        fi
-        open_directory
-    elif egrep -q -i '(text|data)' <<< "$file_format"; then
-        sleep 0.01
-        open_file
-    else
-        open_unknown
+        sleep 0.05
     fi
 }
 
@@ -122,192 +46,73 @@ open_with_ipc()
 make_vifm_start_config()
 {
     printf "%b" "noremap \\l : normal! l<cr>\n"\
-        "noremap \\h : normal! h<cr>\n"\
-        "nnoremap l : execute '!! $prog -l \"%c\" &' <cr>\n"\
-        "nnoremap h : execute '!! $prog -h \"\$(dirname %d)\" &' <cr>\n"\
-        "nnoremap ~ : execute '!! $prog -o \"~\" &' <cr>\n"\
-        "nnoremap ZQ : execute '!! $prog -q vifm &' <cr>\n"\
+        "set vicmd=\"vim --servername envi --remote-tab-silent &\"\n"\
+        "if \$SHELL == system('which fish')\n"\
+        "    com! vcd :execute 'cd' system('readlink /proc/(pidof -s envim)/cwd ^ /dev/null &; if [ \$status != \"0\" ]; echo \".\"; end')\n"\
+        "    com! fcd :execute '!!vim --servername envi --remote-send \"<Esc>: Fcd<CR>\" ^ /dev/null &; echo (if [ (pgrep -P (pidof -s envish)) ]; tmux send-keys -tenvi C-z Enter Enter ^ /dev/null &; end); echo (sleep 0.1; tmux send-keys -tenvi M-f) ^ /dev/null &'\n"\
+        "    com! scd :execute 'cd' system('readlink /proc/(pidof -s envish)/cwd ^ /dev/null; if [ \$status != \"0\" ]; echo \".\"; end')\n"\
+        "    nmap <space>cd :vcd<cr>\n"\
+        "    nno l : normal! l<cr>: fcd<cr>\n"\
+        "    nno h : normal! h<cr>: fcd<cr>\n"\
+        "    nno <space>r : fcd<cr>\n"\
+        "    nno <c-o> <C-o>: fcd<cr>\n"\
+        "    nno <tab> <c-w><c-w>: fcd<cr>\n"\
+        "endif"\
         > $basedir/vifm-start
 }
 make_vim_start_config()
 {
-    printf "%b" "nnoremap ZZ : "\
-        "wa \| "\
-        "silent !$prog -q vim &<cr>"\
+    printf "%b" \
+        "function! _vcd(dir)\n"\
+        "   if a:dir != '' \n"\
+        "       exec 'cd' a:dir\n"\
+        "   endif\n"\
+        "   call system(\"!!echo (if [ (pgrep -P (pidof -s envish)) ]; tmux send-keys -tenvi C-z Enter Enter ^ /dev/null &; end); echo (sleep 0.1; tmux send-keys -tenvi M-v) ^ /dev/null &;\")\n"\
+        "   call system(\"vifm --server-name envi --remote -c vcd ^ /dev/null &; cd \$argv\")\n"\
+        "endfunction\n"\
+        "function! _zz()\n"\
+        "   call system(\"tmux kill-session -tenvi ^ /dev/null &\")\n"\
+        "   call system(\"vifm --server-name envi --remote -c exit ^ /dev/null\")\n"\
+        "endfunction\n"\
+        "command! -complete=dir -nargs=? Vcd call _vcd('<args>')\n"\
+        "command! Scd exec 'cd' system (\"if [ (pidof envish) ]; readlink /proc/(pidof -s envish)/cwd; end\")\n"\
+        "command! Fcd exec 'cd' system (\"if [ (pidof envifm) ]; readlink /proc/(pidof -s envifm)/cwd; end\")\n"\
+        "nno ZZ :call _zz() \| wqa<CR>\n"\
         > $basedir/vim-start.vim
+}
+make_sh_start_config()
+{
+    printf "%b" \
+        "alias 'scd'='vim --servername envi --remote-send \"<Esc>: Scd<CR>\" ^ /dev/null &; vifm --server-name envi --remote -c scd ^ /dev/null &; cd \$argv'\n"\
+        "bind -M insert \\\\ev 'if [ (pidof -s envim) != \"\" ] ^ /dev/null; cd (readlink /proc/(pidof -s envim)/cwd); if [ (jobs) ]; fg ^&1 > /dev/null; end; commandline -f repaint; end'\n"\
+        "bind -M normal \\\\ev 'if [ (pidof -s envim) != \"\" ] ^ /dev/null; cd (readlink /proc/(pidof -s envim)/cwd); if [ (jobs) ]; fg ^&1 > /dev/null; end; commandline -f repaint; end'\n"\
+        "bind -M insert \\\\ef 'if [ (pidof -s envifm) != \"\" ] ^ /dev/null; cd (readlink /proc/(pidof -s envifm)/cwd); if [ (jobs) ]; fg ^&1 > /dev/null; end; commandline -f repaint; end'\n"\
+        "bind -M normal \\\\ef 'if [ (pidof -s envifm) != \"\" ] ^ /dev/null; cd (readlink /proc/(pidof -s envifm)/cwd); if [ (jobs) ]; fg ^&1 > /dev/null; end; commandline -f repaint; end'\n"\
+        > $basedir/sh-start.fish
+}
+make_tmux_start_config()
+{
+    printf "%b" \
+        "set -g status off"\
+        > $basedir/tmux-start.conf
 }
 
 # start functions
 start_vim_server()
 {
-    vim_start_options="'silent source $basedir/vim-start.vim'"
-    tmux new-session -d -s $tvim_servername 
-
-    # disable top status bar to hide my shame of wrapping a server in a server
-    tmux set-option -t$tvim_servername status off
-
-    tmux send-keys -t$tvim_servername \
-        "   vim --servername $vim_servername -c $vim_start_options" C-m
-    $terminal tmux attach-session -d -t$tvim_servername &
+    vim_start_options="silent source $basedir/vim-start.vim"
+    $terminal $vim_cmd --servername $vim_servername -c "$vim_start_options" &
 }
-start_bash_server()
+start_sh_server()
 {
-    tmux new-session -d -s $bash_servername zsh
-    $terminal tmux attach-session -d -t$bash_servername &
+    tmux -f $basedir/tmux-start.conf new-session -d -s $sh_servername $fish_cmd
+    tmux send-keys -t$sh_servername " source $basedir/sh-start.fish" C-m C-l C-l
+    $terminal tmux attach-session -d -t$sh_servername &
 }
 start_vifm_server()
 {
-    tmux new-session -d -s $vifm_servername
-    tmux set-option -t$vifm_servername status off
-    tmux send-keys -t$vifm_servername \
-        "   vifm -c source\ $basedir/vifm-start" C-m
-    $terminal tmux attach-session -d -t$vifm_servername &
+    vifm_start_options="source $basedir/vifm-start"
+    $terminal $vifm_cmd --server-name $vifm_servername -c "$vifm_start_options" &
 }
-
-# detach functions
-detach_vifm_server()
-{
-    tmux detach-client -s$vifm_servername
-    $terminal tmux attach-session -d -t$vifm_servername &
-}
-detach_bash_server()
-{
-    tmux detach-client -s$vifm_servername
-    tmux detach-client -s$bash_servername
-    $terminal tmux attach-session -d -t$bash_servername &
-}
-detach_vim_server()
-{
-    tmux detach-client -s$tvim_servername
-    tmux detach-client -s$vifm_servername
-    tmux detach-client -s$bash_servername
-    $terminal tmux attach-session -d -t$tvim_servername &
-}
-
-# inter process functions
-open_directory()
-{
-    dirname_clean_vim=$(readlink -f "$filename")
-    if [ ! -d "$dirname_clean_vim" ]; then
-        return
-    fi
-    dirname_clean_bash=$dirname_clean_vim
-    echo $dirname_clean_vim &> $basedir/.last # set initial folder if we close
-
-    # change tmux directory
-    clean_bash
-    invisible_cmd "cd $dirname_clean_bash"
-
-    # change Vim directory
-    clean_vim
-    vim_keys="<esc>:cd $dirname_clean_vim<return>"
-    vim --servername $vim_servername --remote-send \
-        "$vim_keys"
-}
-open_directory_vifm()
-{
-    dirname_clean_vifm=$(readlink -f "$filename")
-    if [ ! -d "$dirname_clean_vifm" ]; then
-        return
-    fi
-    clean_vifm
-    tmux send-keys -t$vifm_servername Escape ":  cd $dirname_clean_vifm"
-    sleep 0.1 # fix problem on initialization
-    tmux send-keys -t$vifm_servername Enter
-}
-open_file()
-{
-    vim --servername $vim_servername --remote-tab-silent "$filename"
-}
-open_unknown()
-{
-    echo "$file_format" >> $basedir/unknown
-    tmux send-keys -t$vifm_servername ":normal! l" Enter
-}
-
-#utility functions
-invisible_cmd() # probably won't work for anything but "cd" commands
-{
-    # preserve state, change directory, remain "invisible" on terminal emulator
-    # works with either key mode set in bash. stty -echo may not work in zsh
-    # see: $ man stty $ man console_codes $ man bash $ man bg
-    # tmux send-keys -t$bash_servername C-z Escape C-s Escape C-a Home  "II " \
-    #     End C-u "  stty -echo" Enter \
-    #     "   $@; fg &> $basedir/fg" Enter C-q
-    # timeout=500
-    # while [ ! -f $basedir/fg -a $timeout -gt 0 ]; do
-    #     sleep 0.001
-    #     timeout=$(expr $timeout - 1)
-    # done
-    # if [ "$(cat $basedir/fg)" != "fg: current: no such job" ]; then
-    #     tmux send-keys -t$bash_servername C-z \
-    #         "   stty echo; printf '\e[3F\e[J'; fg > /dev/null" Enter
-    # else
-    #     tmux send-keys -t$bash_servername \
-    #         "   stty echo; printf '\e[F\e[J'" Enter \
-    #         C-y Home M-d C-d Escape x Escape x End Escape A C-q
-    # fi
-    # rm $basedir/fg -f
-    tmux send-keys -t$bash_servername C-z Escape "cc$@; fg; clear; zsh -c \"exit 0\"" Enter
-    sleep 0.1
-    sed -i '$ d' ~/.zsh_history
-}
-unclean()
-{
-    filename=${filename//"\\ "/ }
-    filename=${filename//"\\("/(}
-    filename=${filename//"\\)"/)}
-    filename=${filename//"\\'"/\'}
-}
-clean_vifm()
-{
-    dirname_clean_vifm=${dirname_clean_vifm//\/\\\\}
-    for i in " "  "'" '"' ; do
-        dirname_clean_vifm=${dirname_clean_vifm//$i/\\$i}
-    done
-    dirname_clean_vifm=${dirname_clean_vifm//$/\$\$}
-}
-clean_bash()
-{
-    dirname_clean_bash=${dirname_clean_bash//\/\\\\}
-    for i in " " \; \$ \( \) \' \" \&; do
-        dirname_clean_bash=${dirname_clean_bash//$i/\\$i}
-    done
-}
-clean_vim()
-{
-    dirname_clean_vim=${dirname_clean_vim//\\/\\\\}
-    for i in " " \| \# \% \( \) \{ \} \[ \] \' \" \\; do
-        dirname_clean_vim=${dirname_clean_vim//$i/\\$i}
-    done
-}
-quit()
-{
-    if [ "$1" == "vim" ]; then
-        tmux kill-session -t$bash_servername
-        tmux kill-session -t$vifm_servername
-        tmux kill-session -t$tvim_servername
-    elif [ "$1" == "vifm" ]; then
-        tmux kill-session -t$tvim_servername
-        tmux kill-session -t$bash_servername
-        tmux kill-session -t$vifm_servername
-    else
-        tmux kill-session -t$tvim_servername
-        tmux kill-session -t$vifm_servername
-        tmux kill-session -t$bash_servername
-    fi
-    pkill -5 vim
-}
-
-if [ "$1" == "-g" ]; then
-    genvi -q
-    genvi "${@:2}"
-    exit
-fi
-
-# exit if duplicates running
-if [ $(pgrep $prog|wc -l) -gt 2 ]; then
-    exit
-fi
 
 main "$@"
