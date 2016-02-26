@@ -34,15 +34,21 @@ operation
 
 ### vifm
 
+Abridged. Please submit an issue if there is functionality which changes
+directory without a call to fcd.
+
 Command/Keybinding | Operation
 -------------------|----------
 :vcd | changes active directory to vim's directory
 :scd | changes active directory to the shell's directory
-:fcd or space-r | changes the active directory of the shell and vim to vifm's directory
+:fcd or Backslash-r | changes the active directory of the shell and vim to vifm's directory
+:his | allows navigation of the history then calls fcd
 l | if the item under the cursor is a directory, opens the directory and calls :fcd. if it is a text file, opens it remotely in vim
 h | enters the parent directory and calls :fcd
-Ctrl-o | opens the previous directory and calls :fcd
-Tab | switches the active pane and calls :fcd
+m or ' | set and go to marks and call :fcd
+Ctrl-o | goes back in history and calls :fcd
+Ctrl-i (if t is not included in cpoptions) | goes forward in history and calls :fcd
+Tab or C-i or Space or <c-w><c-w> | switches the active pane and calls :fcd
 
 ### Vim
 

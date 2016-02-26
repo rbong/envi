@@ -50,11 +50,12 @@ make_vifm_start_config()
         "com! vcd :execute 'cd' system('readlink /proc/(pidof -s envim)/cwd ^ /dev/null &; if [ \$status != \"0\" ]; echo \".\"; end')\n"\
         "com! fcd :execute '!!vim --servername envi --remote-send \"<Esc>: Fcd<CR>\" ^ /dev/null &; echo (if [ (pgrep -P (pidof -s envish)) ]; tmux send-keys -tenvi C-z Enter Enter ^ /dev/null &; end); echo (sleep 0.1; tmux send-keys -tenvi M-f) ^ /dev/null &'\n"\
         "com! scd :execute 'cd' system('readlink /proc/(pidof -s envish)/cwd ^ /dev/null; if [ \$status != \"0\" ]; echo \".\"; end')\n"\
-        "nno l : normal! l<cr>: fcd<cr>\n"\
-        "nno h : normal! h<cr>: fcd<cr>\n"\
-        "nno <space>r : fcd<cr>\n"\
-        "nno <c-o> <C-o>: fcd<cr>\n"\
+        "com! his :history | fcd\n"\
+        "autocmd DirEnter * fcd\n"\
+        "nno \\\\r : fcd<cr>\n"\
         "nno <tab> <c-w><c-w>: fcd<cr>\n"\
+        "nno <space> <c-w><c-w>: fcd<cr>\n"\
+        "nno <c-w><c-w> <c-w><c-w>: fcd<cr>\n"\
         > $basedir/vifm-start
 }
 make_vim_start_config()
