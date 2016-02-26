@@ -39,7 +39,7 @@ Command/Keybinding | Operation
 :vcd | changes active directory to vim's directory
 :scd | changes active directory to the shell's directory
 :fcd or space-r | changes the active directory of the shell and vim to vifm's directory
-l | if it is a directory, opens the directory and calls :fcd. if it is a text file, opens it remotely in vim
+l | if the item under the cursor is a directory, opens the directory and calls :fcd. if it is a text file, opens it remotely in vim
 h | enters the parent directory and calls :fcd
 Ctrl-o | opens the previous directory and calls :fcd
 Tab | switches the active pane and calls :fcd
