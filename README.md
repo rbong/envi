@@ -47,8 +47,8 @@ l | if the item under the cursor is a directory, opens the directory and calls :
 h | enters the parent directory and calls :fcd
 m or ' | set and go to marks and call :fcd
 Ctrl-o | goes back in history and calls :fcd
-Ctrl-i (if t is not included in cpoptions) | goes forward in history and calls :fcd
-Tab or C-i or Space or <c-w><c-w> | switches the active pane and calls :fcd
+Tab or Ctrl-i (if t is not included in cpoptions) | goes forward in history and calls :fcd
+Tab or Ctrl-i or Space or <c-w><c-w> | switches the active pane and calls :fcd
 
 ### Vim
 
