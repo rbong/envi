@@ -1,0 +1,50 @@
+#!/bin/bash
+vim_servername=envi
+out=~/.envi/out
+tmpfile=/tmp/.vim
+
+if [ ! -p $out ]; then
+    mkfifo $out
+fi
+
+rm -f $tmpfile &> /dev/null
+
+parse()
+{
+    head=$@
+    head=${head:0:2}
+    if [ "$head"  == "" ]; then
+        while [ -f $tmpfile ]; do
+            sleep .1
+        done
+        touch $tmpfile
+        line=$(echo $@ | cut -c 3-)
+        file=${line%%:*}
+        if [ "$file" != "" -a -f "$file" ]; then
+            vim --servername $vim_servername --remote $file
+        else
+            exit
+        fi
+        linenum=${line#*:}
+        linenum=${linenum%%:*}
+        if [ "$linenum" -eq "$linenum" ] 2> /dev/null; then
+            vim --servername $vim_servername --remote-send \ "<esc>"$linenum"GzozzV"
+        fi
+        rm -f $tmpfile &> /dev/null
+    fi
+}
+while true; do
+    while read i < $out; do
+        parse "$i" & # might miss output if not run in background
+    done
+done &
+loop_pid=$!
+
+trap "" SIGINT
+trap "" SIGKILL
+
+gdb --fullname "$@" | ftee "$out" | press ""
+
+kill -s 15 $loop_pid
+trap - SIGINT
+trap - SIGKILL
