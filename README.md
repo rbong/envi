@@ -19,11 +19,11 @@ prompts. For example, gdb, which is demonstrated in the genvi script.
 dependencies
 ====
 
-+vifm
-+tmux
-+Vim (compiled with clientserver capabilities)
-+fish (more shells will be supported in the future)
-+bash
+* vifm
+* tmux
+* Vim (compiled with clientserver capabilities)
+* fish (more shells will be supported in the future)
+* bash
 
 Note that the script is not intended for others. It is merely for example
 purposes. I may change it suddenly and not add extensibility. If you plan to
@@ -48,39 +48,34 @@ install it in full.
 operation
 ====
 
-* vifm:
-  * :vcd
-    * changes active directory to vim's directory
-  * :scd
-    * changes active directory to the shell's directory
-  * :fcd or space-r
-    * changes the active directory of the shell and vim to vifm's directory
-  * l
-    * if it is a directory, opens the directory and calls :fcd
-    * if it is a text file, opens it remotely in vim
-  * h
-    * enters the parent directory and calls :fcd
-  * Ctrl-o
-    * opens the previous directory and calls :fcd
-  * Tab
-    * switches the active pane and calls :fcd
-  * see the vifm manual for the full commands not altered by the script
-* Vim
-  * :Vcd or _vcd()
-    * changes the active directory of the shell and vim to vim's directory
-  * :Scd
-    * changes active directory to the shell's directory
-  * :Fcd
-    * changes active directory to vifm's directory
-  * :ZZ or ZZ or _zz()
-    * quit all programs and exit
-* fish
-  * scd
-    * changes the active directory of the vifm and vim to the shell's directory
-  * Alt-v
-    * changes the active directory to vim's directory
-  * Alt-f
-    * changes the active directory to vifm's directory
+## Vvifm
+
+Command/Keybinding | Operation
+-------------------|----------
+:vcd | changes active directory to vim's directory
+:scd | changes active directory to the shell's directory
+:fcd or space-r | changes the active directory of the shell and vim to vifm's directory
+l | if it is a directory, opens the directory and calls :fcd. if it is a text file, opens it remotely in vim
+h | enters the parent directory and calls :fcd
+Ctrl-o | opens the previous directory and calls :fcd
+Tab | switches the active pane and calls :fcd
+
+## Vim
+
+Command/Keybinding | Operation
+-------------------|----------
+:Vcd or _vcd() | changes the active directory of the shell and vim to vim's directory
+:Scd | changes active directory to the shell's directory
+:Fcd | changes active directory to vifm's directory
+:ZZ or ZZ or _zz() | quit all programs and exit
+
+## fish
+
+Command/Keybinding | Operation
+-------------------|----------
+scd | changes the active directory of the vifm and vim to the shell's directory
+Alt-v | changes the active directory to vim's directory
+Alt-f | changes the active directory to vifm's directory
 
 genvi
 ====
