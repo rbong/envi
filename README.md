@@ -21,11 +21,6 @@ dependencies
 * fish (more shells will be supported in the future)
 * bash
 
-Note that the script is not intended for others. It is merely for example
-purposes. I may change it suddenly and not add extensibility. If you plan to
-use envi on your own, please submit an issue with your desired usage and I will
-begin to support it.
-
 installation
 ====
 
