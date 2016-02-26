@@ -83,6 +83,7 @@ make_vim_start_config()
 make_sh_start_config()
 {
     printf "%b" \
+        "set HISTCONTROL ignorespace\n"\
         "alias 'scd'='vim --servername envi --remote-send \"<Esc>: Scd<CR>\" ^ /dev/null &; vifm --server-name envi --remote -c scd ^ /dev/null &; cd \$argv'\n"\
         "bind -M insert \\\\ev 'if [ (pidof -s envim) != \"\" ] ^ /dev/null; cd (readlink /proc/(pidof -s envim)/cwd); if [ (jobs) ]; fg ^&1 > /dev/null; end; commandline -f repaint; end'\n"\
         "bind -M normal \\\\ev 'if [ (pidof -s envim) != \"\" ] ^ /dev/null; cd (readlink /proc/(pidof -s envim)/cwd); if [ (jobs) ]; fg ^&1 > /dev/null; end; commandline -f repaint; end'\n"\
