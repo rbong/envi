@@ -48,7 +48,7 @@ make_vifm_start_config()
     printf "%b" "noremap \\l : normal! l<cr>\n"\
         "set vicmd=\"vim --servername envi --remote-tab-silent &\"\n"\
         "com! vcd :execute 'cd' system('readlink /proc/(pidof -s envim)/cwd ^ /dev/null &; if [ \$status != \"0\" ]; echo \".\"; end')\n"\
-        "com! fcd :execute '!!vim --servername envi --remote-send \"<Esc>: Fcd<CR>\" ^ /dev/null &; if [ (pgrep -P (pidof -s envish) ^ /dev/null) ]; tmux send-keys -tenvi C-z Escape Escape \"cc fg; clear\" Enter M-f ^ /dev/null &; else; tmux send-keys -tenvi M-f ^ /dev/null &; end ^ /dev/null &'\n"\
+        "com! fcd :execute '!!vim --servername envi --remote-send \"<Esc>: Fcd<CR>\" ^ /dev/null &; if [ (pgrep -P (pidof -s envish) ^ /dev/null) ]; tmux send-keys -tenvi C-z Escape Escape \"cc\" M-f \" fg; clear\" Enter ^ /dev/null &; else; tmux send-keys -tenvi M-f ^ /dev/null &; end ^ /dev/null &'\n"\
         "com! scd :execute 'cd' system('readlink /proc/(pidof -s envish)/cwd ^ /dev/null; if [ \$status != \"0\" ]; echo \".\"; end')\n"\
         "com! his :history | fcd\n"\
         "autocmd DirEnter * fcd\n"\
