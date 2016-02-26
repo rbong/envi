@@ -32,7 +32,7 @@ sudo make install
 operation
 ====
 
-## vifm
+### vifm
 
 Command/Keybinding | Operation
 -------------------|----------
@@ -44,7 +44,7 @@ h | enters the parent directory and calls :fcd
 Ctrl-o | opens the previous directory and calls :fcd
 Tab | switches the active pane and calls :fcd
 
-## Vim
+### Vim
 
 Command/Keybinding | Operation
 -------------------|----------
@@ -53,7 +53,7 @@ Command/Keybinding | Operation
 :Fcd | changes active directory to vifm's directory
 :ZZ or ZZ or _zz() | quit all programs and exit
 
-## fish
+### fish
 
 Command/Keybinding | Operation
 -------------------|----------
