@@ -6,15 +6,11 @@ available.
 envi
 ====
 
-Envi is a small programming tool written in bash. It ties together existing
-tools like vim, vifm (a vi-like file manager), and a shell. It provides a full
-shell and file manager to vim without any of the quirks and lacking features of
-plugins that do the same. Primarily, it performs directory sharing between the
-three tools. It is extensible through configuration files in the same format as
-the ones shown in the script.
-
-It is also possible, with this system, to use vim as a visualizer for command
-prompts. For example, gdb, which is demonstrated in the genvi script.
+* Shares active directory between discrete sessions of vim, vifm (vi file manager), and fish (friendly shell)
+* Files opened in the filemanager are opened in vim
+* Provides a shell/file manager to vim without quirks/limitations
+* The current location of gdb is opened in vim
+* Provided as an example for personal interprocess communication systems
 
 dependencies
 ====
@@ -33,17 +29,10 @@ begin to support it.
 installation
 ====
 
-If you don't want to use the urxvt terminal emulator, place your terminal and
-an argument that runs commands in the "terminal" variable in envi. To install
-envi in full (debugger and all), type in
 ```
 make
 sudo make install
 ```
-If you do not plan to use gdb with envi and instead plan to use a tool like
-gdb -tui instead for visual debugging, simply move envi to /usr/bin, or
-/usr/local/bin. If you do plan to write scripts for envi, you may want to
-install it in full.
 
 operation
 ====
