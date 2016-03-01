@@ -1,0 +1,10 @@
+noremap \l : normal! l<cr>
+set vicmd="vim --servername envi --remote-tab-silent &"
+com! vcd :execute 'cd' system('readlink /proc/(pidof -s envim)/cwd ^ /dev/null &; if [ $status != "0" ]; echo "."; end')
+com! fcd :execute '!!vim --servername envi --remote-send "<Esc>: Fcd<CR>" ^ /dev/null &; if [ ! (pgrep -P (pidof -s envish) ^ /dev/null) ]; tmux send-keys -tenvi M-f ^ /dev/null &; end &'
+com! scd :execute 'cd' system('readlink /proc/(pidof -s envish)/cwd ^ /dev/null; if [ $status != "0" ]; echo "."; end')
+com! his :history | fcd
+autocmd DirEnter * fcd
+nno \r : fcd<cr>
+nno <space> <c-w><c-w>: fcd<cr>
+nno <c-w><c-w> <c-w><c-w>: fcd<cr>

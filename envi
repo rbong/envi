@@ -20,11 +20,7 @@ make_configs()
     if [ ! -d $basedir ]; then
         rm -rf "$basedir"
         mkdir "$basedir"
-        make_vifm_start_config
-        make_vim_start_config
-        make_sh_start_config
-        make_tmux_start_config
-        make_genvi_start_config
+        cp /usr/local/etc/envi/* "$basedir"
     fi
 }
 find_servers()
@@ -41,90 +37,6 @@ find_servers()
         start_vifm_server
         sleep 0.05
     fi
-}
-
-# config functions
-make_vifm_start_config()
-{
-    printf "%b" "noremap \\l : normal! l<cr>\n"\
-        "set vicmd=\"vim --servername envi --remote-tab-silent &\"\n"\
-        "com! vcd :execute 'cd' system('readlink /proc/(pidof -s envim)/cwd ^ /dev/null &; if [ \$status != \"0\" ]; echo \".\"; end')\n"\
-        "com! fcd :execute '!!vim --servername envi --remote-send \"<Esc>: Fcd<CR>\" ^ /dev/null &; if [ ! (pgrep -P (pidof -s envish) ^ /dev/null) ]; tmux send-keys -tenvi M-f ^ /dev/null &; end &'\n"\
-        "com! scd :execute 'cd' system('readlink /proc/(pidof -s envish)/cwd ^ /dev/null; if [ \$status != \"0\" ]; echo \".\"; end')\n"\
-        "com! his :history | fcd\n"\
-        "autocmd DirEnter * fcd\n"\
-        "nno \\\\r : fcd<cr>\n"\
-        "nno <space> <c-w><c-w>: fcd<cr>\n"\
-        "nno <c-w><c-w> <c-w><c-w>: fcd<cr>\n"\
-        > $basedir/vifm-start
-}
-make_vim_start_config()
-{
-    printf "%b" \
-        "function! _vcd(dir)\n"\
-        "   if a:dir != '' \n"\
-        "       exec 'cd' a:dir\n"\
-        "   endif\n"\
-        "   call system(\"!!echo (if [ (pgrep -P (pidof -s envish)) ]; tmux send-keys -tenvi C-z Enter Enter ^ /dev/null &; end); echo (sleep 0.1; tmux send-keys -tenvi M-v) ^ /dev/null &;\")\n"\
-        "   call system(\"vifm --server-name envi --remote -c vcd ^ /dev/null &; cd \$argv\")\n"\
-        "endfunction\n"\
-        "function! _zz()\n"\
-        "   call system(\"tmux kill-session -tenvi ^ /dev/null &\")\n"\
-        "   call system(\"vifm --server-name envi --remote -c exit ^ /dev/null\")\n"\
-        "endfunction\n"\
-        "command! -complete=dir -nargs=? Vcd call _vcd('<args>')\n"\
-        "command! Scd exec 'cd' system (\"if [ (pidof envish) ]; readlink /proc/(pidof -s envish)/cwd; end\")\n"\
-        "command! Fcd exec 'cd' system (\"if [ (pidof envifm) ]; readlink /proc/(pidof -s envifm)/cwd; end\")\n"\
-        "nno ZZ :call _zz() \| wqa<CR>\n"\
-        > $basedir/vim-start.vim
-}
-make_sh_start_config()
-{
-    printf "%b" \
-        "set HISTCONTROL ignorespace\n"\
-        "alias 'scd'='vim --servername envi --remote-send \"<Esc>: Scd<CR>\" ^ /dev/null &; vifm --server-name envi --remote -c scd ^ /dev/null &; cd \$argv'\n"\
-        "bind -M insert \\\\ev 'if [ (pidof -s envim) != \"\" ] ^ /dev/null; cd (readlink /proc/(pidof -s envim)/cwd); commandline -f repaint; end'\n"\
-        "bind -M normal \\\\ev 'if [ (pidof -s envim) != \"\" ] ^ /dev/null; cd (readlink /proc/(pidof -s envim)/cwd); commandline -f repaint; end'\n"\
-        "bind -M insert \\\\ef 'if [ (pidof -s envifm) != \"\" ] ^ /dev/null; cd (readlink /proc/(pidof -s envifm)/cwd); commandline -f repaint; end'\n"\
-        "bind -M normal \\\\ef 'if [ (pidof -s envifm) != \"\" ] ^ /dev/null; cd (readlink /proc/(pidof -s envifm)/cwd); commandline -f repaint; end'\n"\
-        > $basedir/sh-start.fish
-}
-make_tmux_start_config()
-{
-    printf "%b" \
-        "set -g status off"\
-        > $basedir/tmux-start.conf
-}
-make_genvi_start_config()
-{
-    printf "%b"\
-        "python\n"\
-        "from re import compile\n"\
-        "from subprocess import call\n"\
-        "end\n"\
-        "\n"\
-        "define hook-stop\n"\
-        "    python\n"\
-        "def exe_re (cmd, rgx_str):\n"\
-        "    res = gdb.execute (cmd, False, True)\n"\
-        "    rgx = compile (rgx_str)\n"\
-        "    srch = rgx.search (res)\n"\
-        "    return srch.group (1)\n"\
-        "\n"\
-        "def hook():\n"\
-        "    line = exe_re (\"frame\", \"([0-9]+)\\\\n\")\n"\
-        "\n"\
-        "    src = exe_re (\"info source\", \"\\\\nLocated in (.+)\\\\n\")\n"\
-        "\n"\
-        "    res = call ([\"vim\", \"--servername\", \"envi\", \"--remote\", src])\n"\
-        "    res = call ([\"vim\", \"--servername\", \"envi\", \"--remote-send\", \"<esc>\" + line + \"GzozzV\"])\n"\
-        "\n"\
-        "try:\n"\
-        "    hook ()\n"\
-        "except:\n"\
-        "    pass\n"\
-        "end\n"\
-        "end\n" > ~/.envi/genvi.gdb
 }
 
 # start functions
