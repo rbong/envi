@@ -24,6 +24,7 @@ make_configs()
         make_vim_start_config
         make_sh_start_config
         make_tmux_start_config
+        make_genvi_start_config
     fi
 }
 find_servers()
@@ -93,6 +94,37 @@ make_tmux_start_config()
     printf "%b" \
         "set -g status off"\
         > $basedir/tmux-start.conf
+}
+make_genvi_start_config()
+{
+    printf "%b"\
+        "python\n"\
+        "from re import compile\n"\
+        "from subprocess import call\n"\
+        "end\n"\
+        "\n"\
+        "define hook-stop\n"\
+        "    python\n"\
+        "def exe_re (cmd, rgx_str):\n"\
+        "    res = gdb.execute (cmd, False, True)\n"\
+        "    rgx = compile (rgx_str)\n"\
+        "    srch = rgx.search (res)\n"\
+        "    return srch.group (1)\n"\
+        "\n"\
+        "def hook():\n"\
+        "    line = exe_re (\"frame\", \"([0-9]+)\\\\n\")\n"\
+        "\n"\
+        "    src = exe_re (\"info source\", \"\\\\nLocated in (.+)\\\\n\")\n"\
+        "\n"\
+        "    res = call ([\"vim\", \"--servername\", \"envi\", \"--remote\", src])\n"\
+        "    res = call ([\"vim\", \"--servername\", \"envi\", \"--remote-send\", \"<esc>\" + line + \"GzozzV\"])\n"\
+        "\n"\
+        "try:\n"\
+        "    hook ()\n"\
+        "except:\n"\
+        "    pass\n"\
+        "end\n"\
+        "end\n" > ~/.envi/genvi.gdb
 }
 
 # start functions
