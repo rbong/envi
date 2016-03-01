@@ -20,12 +20,12 @@ dependencies
 * Vim (compiled with clientserver capabilities)
 * fish (more shells will be supported in the future)
 * bash
+* gdb >= 7.3 (if you wish to use genvi)
 
 installation
 ====
 
 ```
-make
 sudo make install
 ```
 
@@ -67,14 +67,17 @@ scd | changes the active directory of the vifm and vim to the shell's directory
 Alt-v | changes the active directory to vim's directory
 Alt-f | changes the active directory to vifm's directory
 
+configuration
+====
+
+Call the script once and then modify the configuration files inside ~/.envi (by
+default).
+
 genvi
 ====
 
 Call genvi as you would call gdb. Requires compilation with the -g flag, as
 with gdb.
 
-configuration
-====
-
-Call the script once and then modify the configuration files inside ~/.envi (by
-default).
+genvi uses hooks to execute directory syncing before functions. You can change
+the ~/.envi/genvi.gdb file to add or remove hooks.
