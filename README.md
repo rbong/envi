@@ -1,7 +1,7 @@
 [video](https://github.com/rbong/envi/raw/master/video/ipc.mkv)
 
-Note that the reconnection displayed in this video is temporarily not
-available.
+With the creation of [neovim-vifm](https://github.com/vifm/neovim-vifm), this
+script is no longer maintained.
 
 envi
 ====
